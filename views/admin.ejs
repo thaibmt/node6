@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Quản lý quần áo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/app.css" />
+</head>
+
+<body>
+
+    <section id="navbar">
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Clothes Store</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav m-auto">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Trang chủ</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="/login">Đăng nhập</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="/logout">Đăng xuất</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </section>
+
+    <!-- services -->
+    <section id="service">
+        <h1 class="text-center">Danh sách quần áo</h1>
+        <div class="container-fluid" id="service-container">
+            <div class="row" id="banner-row">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong class="text-danger">
+                            <%= error ? (typeof error=='boolean' ? 'Có lỗi xảy ra' : error) :'' %>
+                        </strong>
+                        <strong class="text-success">
+                            <%= success ? 'Thành công' :'' %>
+                        </strong>
+                    </div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Tên</th>
+                                <th scope="col">Giá</th>
+                                <th scope="col">Mô tả</th>
+                                <th scope="col" class="text-center">Chức năng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% clothess.forEach((clothes,index)=>{ %>
+                                <tr>
+                                    <th scope="row">
+                                        <%= index+1 %>
+                                    </th>
+                                    <td>
+                                        <a href="clothess/<%= clothes._id %>">
+                                            <%=clothes.title %>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <%= clothes.price %>đ
+                                    </td>
+                                    <td>
+                                        <%= clothes.description %>
+                                    </td>
+
+                                    <td class="d-flex text-center justify-content-center">
+                                        <a class="btn btn-primary mx-2" href="clothess/<%= clothes._id %>">
+                                            Xem chi tiết</a>
+                                        <% if(role=='admin' ){ %>
+                                            <a href="#" class="btn btn-warning mx-2"
+                                                onclick="edit('<%= clothes._id %>')">Chỉnh
+                                                Sửa</a>
+                                            <form method="post" action="/clothess/delete/<%= clothes._id %>">
+                                                <button class="btn btn-danger"
+                                                    onclick="confirmDelete('<%= clothes._id %>')">
+                                                    Xóa
+                                                </button>
+                                            </form>
+                                            <% } %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary" onclick="add()">Thêm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <hr />
+
+
+    <!-- Footer -->
+
+    <section id="social">
+        <section id="banner">
+            <div class="container-fluid" id="banner-container">
+                <div class="row" id="banner-row">
+                    <div class="col-md-4" id="footer-col1">
+                        <h1>MY WEBSITE</h1>
+                        <p>
+                            At KRATOS we believe that customers should always get easy-to-use, best in the kind and fast
+                            services. Kratos has achieved
+                            standards which helps customer to achieve satisfaction and realize value for their hard
+                            earned money.</p>
+                    </div>
+                    <div class="col-md-4" id="footer-col2">
+                        <h3>Contact Us</h3>
+                        <p>Call Us: 1800 919 8872</p>
+                        <p>Email Us: kratos@gmail.com</p>
+                    </div>
+                    <div class="col-md-4" id="footer-col2">
+                        <h3>Subscribe to Newsletter</h3>
+                        <form>
+                            <div class="mb-3">
+                                <input type="email" placeholder="Enter Your Email" class="form-control"
+                                    id="exampleInputEmail" aria-describedby="emailHelp" />
+                                <div class="form-text" id="emailHelp">
+                                    We'll never share your email to anyone else.
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+
+
+    <div class="modal" id="clothesModal" tabindex="-1" role="dialog" aria-labelledby="clothesModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clothesModalLabel">
+                        Thêm
+                    </h5>
+                    <button type="button" class="close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="clothesForm" method="post" action="/clothess">
+                        <div class="form-group mb-2">
+                            <label for="clothesTitle">Tiêu đề</label>
+                            <input type="text" class="form-control" id="clothesTitle" name="title" required />
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="clothesPrice">Giá</label>
+                            <input type="number" min="0" class="form-control" id="clothesPrice" name="price" required />
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="clothesDescription">Mô tả ngắn</label>
+                            <textarea class="form-control" id="clothesDescription" name="description"></textarea>
+                        </div>
+                        <div class="text-center w-100">
+                            <button type="submit" class="btn btn-primary">Thêm</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    <script>
+        const clothess = JSON.parse('<%- JSON.stringify(clothess) %>');
+        const clothesForm = document.getElementById("clothesForm");
+        function confirmDelete(clothesId) {
+            var result = confirm("Bạn có chắc muốn xóa quần áo này?");
+            if (result) {
+                window.location.href = "/clothess/delete/" + clothesId;
+            }
+        }
+        function add() {
+            document.getElementById("clothesModalLabel").textContent = "Thêm";
+            document.getElementById("clothesTitle").value = "";
+            document.getElementById("clothesPrice").value = "";
+            document.getElementById("clothesDescription").value = "";
+            clothesForm.action = "/clothess";
+            $("#clothesModal").modal("show");
+        }
+        function edit(clothesId) {
+            const clothes = clothess.filter(clothes => clothes._id == clothesId)[0];
+            if (!clothes) {
+                return;
+            }
+            document.getElementById("clothesModalLabel").textContent = "Sửa";
+            document.getElementById("clothesTitle").value = clothes.title;
+            document.getElementById("clothesPrice").value = clothes.price;
+            document.getElementById("clothesDescription").value = clothes.description;
+            document.getElementById("clothesForm").action =
+                "/clothess/update/" + clothesId;
+            $("#clothesModal").modal("show");
+        }
+    </script>
+</body>
+
+</html>
